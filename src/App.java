@@ -5,16 +5,17 @@ public class App extends PApplet{
         PApplet.main("App");
     }
 
+
+
     public void setup(){
-        
+        background(0);
     }
 
     public void settings(){
-        
+        size(600, 600);
     }
 
     public void draw(){
-       
 
     }
 }
