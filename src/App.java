@@ -11,7 +11,7 @@ public class App extends PApplet{
         PApplet.main("App");
     }
 
-
+    int count  = 75;
 
     public void setup(){
         background(0, 0, 40);
@@ -33,9 +33,31 @@ public class App extends PApplet{
 
     public void draw(){
 
+        int screen = 1;
+        if (screen == 0) {
+            drawStartScreen();
+        } else if (screen == 1) {
+            drawGameScreen();
+        }
+    }
+
+    public void drawStartScreen(){
         background(0, 0, 40);
-        for (Coin c: coins) {
+        }
+    
+
+
+    public void drawGameScreen(){
+        background(0, 0, 40);
+         
+        for (int i = coins.size() - 1; i >= 0; i--) { 
+            Coin c = coins.get(i);
             drawCoin(c);
+
+            if (isTouching(pacman, c)) {
+                coins.remove(i); // Remove the coin if Pac-Man touches it
+                count--;
+            }
 
         fill (255, 255, 0);
         ellipse(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize());
@@ -69,8 +91,10 @@ public class App extends PApplet{
         ellipse(coin.getX(), coin.getY(), coin.getSize(), coin.getSize());
     }
 
-    //I used ChatGPT to check help create methods and variables to check if pacman and the coin are touching. If yes, the coin disapears 
-  
+    public boolean isTouching(Pacman pacman, Coin coin) {
+        float distance = dist(pacman.getX(), pacman.getY(), coin.getX(), coin.getY());
+        return distance < (pacman.getSize() / 2 + coin.getSize() / 2); // Check if distances are less than radii sum
+    }
 
     }
 

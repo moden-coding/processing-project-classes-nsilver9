@@ -36,6 +36,4 @@ public class Pacman {
     public void moveDown(float step) {
         y += step;
     }
-
-
 }
