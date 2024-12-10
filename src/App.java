@@ -12,6 +12,7 @@ public class App extends PApplet{
     }
 
     int count  = 75;
+    int screen = 0;
 
     public void setup(){
         background(0, 0, 40);
@@ -31,21 +32,32 @@ public class App extends PApplet{
         size(600, 600);
     }
 
-    public void draw(){
 
-        int screen = 1;
+    public void draw(){
+       
         if (screen == 0) {
             drawStartScreen();
         } else if (screen == 1) {
             drawGameScreen();
+        } else if (screen == 2) {
+            drawWinScreen();
         }
     }
 
     public void drawStartScreen(){
         background(0, 0, 40);
-        }
-    
 
+        stroke(0);
+        textSize(25);
+        text("Intructions:", 50, 100);
+        text("You are pacman", 50, 150);
+        text("Collect all the coins without touching a ghost", 50, 200);
+        text("Press any key to start", 50, 250);
+
+        if(keyPressed) {
+            screen = 1;
+        }
+        }
 
     public void drawGameScreen(){
         background(0, 0, 40);
@@ -55,13 +67,41 @@ public class App extends PApplet{
             drawCoin(c);
 
             if (isTouching(pacman, c)) {
-                coins.remove(i); // Remove the coin if Pac-Man touches it
+                coins.remove(i);
                 count--;
             }
 
         fill (255, 255, 0);
         ellipse(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize());
         }
+
+        if(count == 0) {
+            screen = 2;
+        }
+    }
+
+    public void drawWinScreen(){
+        textSize(25);
+        text("You win!", 275, 300);
+        text("Press any key to play again", 275, 350);
+
+        if(keyPressed){
+            resetGame();
+            screen = 1;
+        }
+    }
+
+    public void resetGame(){
+        coins.clear();
+        for (int i = 0; i < 75; i++);
+        float x;
+        float y;
+        do {
+            x = random(50, width - 50);
+            y = random(50, width - 50);
+        } while (dist(x, y, pacman.getX(), pacman.getY()) < 75);
+        coins.add(new Coin(x, y, 25));
+    
     }
 
     public void keyPressed() {
@@ -97,4 +137,3 @@ public class App extends PApplet{
     }
 
     }
-
