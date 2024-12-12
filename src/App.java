@@ -7,6 +7,7 @@ public class App extends PApplet{
 
     Coin coin;
     ArrayList<Coin> coins;
+    ArrayList<Ghost> ghosts;
     public static void main(String[] args)  {
         PApplet.main("App");
     }
@@ -14,15 +15,25 @@ public class App extends PApplet{
     int count  = 75;
     int screen = 0;
 
+    int direction;
+
     public void setup(){
         background(0, 0, 40);
         coins = new ArrayList<>();
+
+        ghosts = new ArrayList<>();
 
         for(int i = 0; i < 75; i++) {
             float x = random(50, width - 50);
             float y = random(50, height - 50);
             float size = 25;
             coins.add(new Coin(x, y, size));
+    }
+         
+        for(int g = 0; g < 3; g++) {
+            float gx = random(50, width - 50);
+            float gy = random(50, height - 50);
+            ghosts.add(new Ghost(gx, gy, 30));
 
         pacman = new Pacman(300, 300, 50);
         }
@@ -71,14 +82,38 @@ public class App extends PApplet{
                 count--;
             }
 
-        fill (255, 255, 0);
-        ellipse(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize());
-        }
+            for (int g = ghosts.size() - 1; g >= 0; g--) {
+                Ghost ghost = ghosts.get(g);
+                drawGhost(ghost);
+            }
 
-        if(count == 0) {
+
+
+            fill(255, 255, 0); 
+            // I used ChatGPT here to show me how to create an arc instead of a full circle for pacman's mouth
+    
+            float startAngle, stopAngle;
+            if (direction == 0) {
+                startAngle = PI / 6;
+                stopAngle = TWO_PI - PI / 6;
+            } else if (direction == 1) {
+                startAngle = PI + PI / 6;
+                stopAngle = PI - PI / 6;
+            } else if (direction == 2) {
+                startAngle = -PI / 3;
+                stopAngle = PI / 3;
+            } else if (direction == 3) {
+                startAngle = PI + PI / 3;
+                stopAngle = TWO_PI - PI / 3;
+            }
+            arc(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize(), startAngle, stopAngle);
+        if (coins.isEmpty()) {
             screen = 2;
         }
+        }
     }
+
+
 
     public void drawWinScreen(){
         textSize(25);
@@ -102,6 +137,11 @@ public class App extends PApplet{
         } while (dist(x, y, pacman.getX(), pacman.getY()) < 75);
         coins.add(new Coin(x, y, 25));
     
+        for (int g = 0; g < 3; g++) {
+            float gx = random(50, width - 50);
+            float gy = random(50, height - 50);
+            ghosts.add(new Ghost(gx, gy, 30));
+        }
     }
 
     public void keyPressed() {
@@ -109,12 +149,16 @@ public class App extends PApplet{
 
         if(keyCode == LEFT) {
             pacman.moveLeft(step);
+            direction = 1;
         } else if (keyCode == RIGHT) {
             pacman.moveRight(step);
+            direction = 0;
         } else if (keyCode == UP) {
             pacman.moveUp(step);
+            direction = 2;
         } else if (keyCode == DOWN) {
             pacman.moveDown(step);
+            direction = 3;
         }
 
         //I used ChatGPT here to make contstrains so that pacman can't leave the screen
@@ -131,9 +175,19 @@ public class App extends PApplet{
         ellipse(coin.getX(), coin.getY(), coin.getSize(), coin.getSize());
     }
 
+    public void drawGhost(Ghost ghost) {
+        fill(255, 0, 0);
+        stroke(0);
+        triangle(
+            ghost.getX(), ghost.getY() - ghost.getSize() / 2,
+            ghost.getX() - ghost.getSize() / 2, ghost.getY() + ghost.getSize() / 2,
+            ghost.getX() + ghost.getSize() / 2, ghost.getY() + ghost.getSize() / 2
+        );
+    }
+
     public boolean isTouching(Pacman pacman, Coin coin) {
         float distance = dist(pacman.getX(), pacman.getY(), coin.getX(), coin.getY());
         return distance < (pacman.getSize() / 2 + coin.getSize() / 2); // Check if distances are less than radii sum
     }
 
-    }
+}
