@@ -73,45 +73,53 @@ public class App extends PApplet{
     public void drawGameScreen(){
         background(0, 0, 40);
          
-        for (int i = coins.size() - 1; i >= 0; i--) { 
+        for (int i = coins.size() - 1; i >= 0; i--) {
             Coin c = coins.get(i);
             drawCoin(c);
-
+        
             if (isTouching(pacman, c)) {
                 coins.remove(i);
                 count--;
             }
-
-            for (int g = ghosts.size() - 1; g >= 0; g--) {
-                Ghost ghost = ghosts.get(g);
-                drawGhost(ghost);
+        }
+        
+        for (int g = ghosts.size() - 1; g >= 0; g--) {
+            Ghost ghost = ghosts.get(g);
+            drawGhost(ghost);
+        
+            if (isTouchingGhost(pacman, ghost)) {
+                screen = 2; // Game over
+                return; // Exit early to stop further processing
             }
+
+        }
 
 
 
             fill(255, 255, 0); 
+            noStroke();
             // I used ChatGPT here to show me how to create an arc instead of a full circle for pacman's mouth
     
-            float startAngle, stopAngle;
-            if (direction == 0) {
-                startAngle = PI / 6;
+            float startAngle = 0, stopAngle = TWO_PI; // Default to a closed circle
+            if (direction == 0) { // Right
+                startAngle = PI / 6;         
                 stopAngle = TWO_PI - PI / 6;
-            } else if (direction == 1) {
-                startAngle = PI + PI / 6;
-                stopAngle = PI - PI / 6;
-            } else if (direction == 2) {
-                startAngle = -PI / 3;
-                stopAngle = PI / 3;
-            } else if (direction == 3) {
-                startAngle = PI + PI / 3;
-                stopAngle = TWO_PI - PI / 3;
+            } else if (direction == 1) { // Left
+                startAngle = PI + PI / 6;    
+                stopAngle = PI + TWO_PI - PI / 6;
+            } else if (direction == 2) { // Up
+                startAngle = 3 * PI / 2 + PI / 6;  
+                stopAngle = PI + 7 / 1;  
+            } else if (direction == 3) { // Down
+                startAngle = TWO_PI / 3;                
+                stopAngle = TWO_PI - PI + 25 / 6;
             }
             arc(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize(), startAngle, stopAngle);
         if (coins.isEmpty()) {
             screen = 2;
         }
         }
-    }
+    
 
 
 
@@ -128,15 +136,16 @@ public class App extends PApplet{
 
     public void resetGame(){
         coins.clear();
-        for (int i = 0; i < 75; i++);
+        for (int i = 0; i < 75; i++) {
         float x;
         float y;
+        
         do {
             x = random(50, width - 50);
             y = random(50, width - 50);
         } while (dist(x, y, pacman.getX(), pacman.getY()) < 75);
         coins.add(new Coin(x, y, 25));
-    
+    }
         for (int g = 0; g < 3; g++) {
             float gx = random(50, width - 50);
             float gy = random(50, height - 50);
@@ -188,6 +197,11 @@ public class App extends PApplet{
     public boolean isTouching(Pacman pacman, Coin coin) {
         float distance = dist(pacman.getX(), pacman.getY(), coin.getX(), coin.getY());
         return distance < (pacman.getSize() / 2 + coin.getSize() / 2); // Check if distances are less than radii sum
+    }
+
+    public boolean isTouchingGhost(Pacman pacman, Ghost ghost) {
+        float distance = dist(pacman.getX(), pacman.getY(), ghost.getX(), ghost.getY());
+        return distance < (pacman.getSize() / 2 + ghost.getSize() / 2); // Check if distances are less than radii sum
     }
 
 }
