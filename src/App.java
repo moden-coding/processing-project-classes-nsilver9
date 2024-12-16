@@ -52,6 +52,8 @@ public class App extends PApplet{
             drawGameScreen();
         } else if (screen == 2) {
             drawWinScreen();
+        } else if (screen == 3) {
+            drawGameOverScreen();
         }
     }
 
@@ -88,13 +90,11 @@ public class App extends PApplet{
             drawGhost(ghost);
         
             if (isTouchingGhost(pacman, ghost)) {
-                screen = 2; // Game over
-                return; // Exit early to stop further processing
+                screen = 3; // Game over
+                return;
             }
 
         }
-
-
 
             fill(255, 255, 0); 
             noStroke();
@@ -134,24 +134,50 @@ public class App extends PApplet{
         }
     }
 
-    public void resetGame(){
-        coins.clear();
-        for (int i = 0; i < 75; i++) {
-        float x;
-        float y;
-        
-        do {
-            x = random(50, width - 50);
-            y = random(50, width - 50);
-        } while (dist(x, y, pacman.getX(), pacman.getY()) < 75);
-        coins.add(new Coin(x, y, 25));
+    public void drawGameOverScreen(){
+        textSize(25);
+        text("Game over!", 275, 300);
+        text("Press any key to play again", 275, 350);
+
+        if(keyPressed){
+            resetGame();
+            screen = 1;
+        }
     }
+
+    public void resetGame() {
+        // Clear current coins and ghosts
+        coins.clear();
+        ghosts.clear();
+    
+        // Recreate coins
+        for (int i = 0; i < 75; i++) {
+            float x, y;
+            
+            // Avoid spawning coins too close to Pacman
+            do {
+                x = random(50, width - 50);
+                y = random(50, height - 50);
+            } while (dist(x, y, pacman.getX(), pacman.getY()) < 75);
+            
+            coins.add(new Coin(x, y, 25));
+        }
+    
+        // Recreate ghosts
         for (int g = 0; g < 3; g++) {
             float gx = random(50, width - 50);
             float gy = random(50, height - 50);
             ghosts.add(new Ghost(gx, gy, 30));
         }
+    
+        // Reset Pacman to the default starting position (center of the screen)
+        pacman = new Pacman(width / 2, height / 2, 50);
+    
+        // Reset any other game variables as needed
+        count = 75; // Reset coin count
+        direction = 0; // Reset Pacman's direction
     }
+    
 
     public void keyPressed() {
         float step = 5;
