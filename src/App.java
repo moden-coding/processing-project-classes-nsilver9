@@ -35,7 +35,7 @@ public class App extends PApplet{
             float gy = random(50, height - 50);
             ghosts.add(new Ghost(gx, gy, 30));
 
-        pacman = new Pacman(300, 300, 50);
+        pacman = new Pacman(300, 300, 50, this);
         }
     }
 
@@ -65,12 +65,8 @@ public class App extends PApplet{
         text("Intructions:", 50, 100);
         text("You are pacman", 50, 150);
         text("Collect all the coins without touching a ghost", 50, 200);
-        text("Press any key to start", 50, 250);
-
-        if(keyPressed) {
-            screen = 1;
-        }
-        }
+        text("Press space to start", 50, 250);
+    }
 
     public void drawGameScreen(){
         background(0, 0, 40);
@@ -84,6 +80,7 @@ public class App extends PApplet{
                 count--;
             }
         }
+    
         
         for (int g = ghosts.size() - 1; g >= 0; g--) {
             Ghost ghost = ghosts.get(g);
@@ -91,30 +88,8 @@ public class App extends PApplet{
         
             if (isTouchingGhost(pacman, ghost)) {
                 screen = 3; // Game over
-                return;
             }
-
         }
-
-            fill(255, 255, 0); 
-            noStroke();
-            // I used ChatGPT here to show me how to create an arc instead of a full circle for pacman's mouth
-    
-            float startAngle = 0, stopAngle = TWO_PI; // Default to a closed circle
-            if (direction == 0) { // Right
-                startAngle = PI / 6;         
-                stopAngle = TWO_PI - PI / 6;
-            } else if (direction == 1) { // Left
-                startAngle = PI + PI / 6;    
-                stopAngle = PI + TWO_PI - PI / 6;
-            } else if (direction == 2) { // Up
-                startAngle = 3 * PI / 2 + PI / 6;  
-                stopAngle = PI + 7 / 1;  
-            } else if (direction == 3) { // Down
-                startAngle = TWO_PI / 3;                
-                stopAngle = TWO_PI - PI + 25 / 6;
-            }
-            arc(pacman.getX(), pacman.getY(), pacman.getSize(), pacman.getSize(), startAngle, stopAngle);
         if (coins.isEmpty()) {
             screen = 2;
         }
@@ -124,25 +99,19 @@ public class App extends PApplet{
 
 
     public void drawWinScreen(){
+        background(0);
         textSize(25);
         text("You win!", 275, 300);
-        text("Press any key to play again", 275, 350);
-
-        if(keyPressed){
-            resetGame();
-            screen = 1;
-        }
+        text("Press space to play again", 275, 350);
     }
 
     public void drawGameOverScreen(){
+        background(0);
         textSize(25);
         text("Game over!", 275, 300);
-        text("Press any key to play again", 275, 350);
+        text("Press space to play again", 275, 350);
 
-        if(keyPressed){
-            resetGame();
-            screen = 1;
-        }
+       
     }
 
     public void resetGame() {
@@ -171,37 +140,33 @@ public class App extends PApplet{
         }
     
         // Reset Pacman to the default starting position (center of the screen)
-        pacman = new Pacman(width / 2, height / 2, 50);
+        pacman = new Pacman(width / 2, height / 2, 50, this);
     
         // Reset any other game variables as needed
         count = 75; // Reset coin count
-        direction = 0; // Reset Pacman's direction
     }
     
 
     public void keyPressed() {
         float step = 5;
 
-        if(keyCode == LEFT) {
-            pacman.moveLeft(step);
-            direction = 1;
-        } else if (keyCode == RIGHT) {
-            pacman.moveRight(step);
-            direction = 0;
-        } else if (keyCode == UP) {
-            pacman.moveUp(step);
-            direction = 2;
-        } else if (keyCode == DOWN) {
-            pacman.moveDown(step);
-            direction = 3;
+        if(screen == 3 || screen == 2 || screen == 0) {
+            if(key == ' ') {
+                screen = 1;
+                resetGame();
+            }
         }
 
-        //I used ChatGPT here to make contstrains so that pacman can't leave the screen
-        pacman = new Pacman(
-            constrain(pacman.getX(), pacman.getSize() / 2, width - pacman.getSize() / 2),
-            constrain(pacman.getY(), pacman.getSize() / 2, height - pacman.getSize() / 2),
-            pacman.getSize()
-        );
+        if(keyCode == LEFT) {
+            pacman.moveLeft(step);
+        } else if (keyCode == RIGHT) {
+            pacman.moveRight(step);
+        } else if (keyCode == UP) {
+            pacman.moveUp(step);
+        } else if (keyCode == DOWN) {
+            pacman.moveDown(step);
+        }
+
     }
 
     public void drawCoin(Coin coin){
