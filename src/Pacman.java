@@ -1,4 +1,6 @@
 import processing.core.PApplet;
+import processing.core.PConstants;
+
 public class Pacman {
     private float x;
     private float y;
@@ -10,29 +12,36 @@ public class Pacman {
         this.x = x;
         this.y = y;
         this.size = size;
-        direction = 0;
+        this.canvas = c; // Assign canvas
+        direction = 0;   // Default direction: right
     }
 
-    public void display(){
-        canvas.fill(255, 255, 0); 
+    public void display() {
+        canvas.fill(255, 255, 0);
         canvas.noStroke();
-            // I used ChatGPT here to show me how to create an arc instead of a full circle for pacman's mouth
-    
-            float startAngle = 0, stopAngle = canvas.TWO_PI; // Default to a closed circle
-            if (direction == 0) { // Right
-                startAngle = canvas.PI / 6;         
-                stopAngle = canvas.TWO_PI - canvas.PI / 6;
-            } else if (direction == 1) { // Left
-                startAngle = canvas.PI + canvas.PI / 6;    
-                stopAngle = canvas.PI + canvas.TWO_PI - canvas.PI / 6;
-            } else if (direction == 2) { // Up
-                startAngle = 3 * canvas.PI / 2 + canvas.PI / 6;  
-                stopAngle = canvas.PI + 7 / 1;  
-            } else if (direction == 3) { // Down
-                startAngle = canvas.TWO_PI / 3;                
-                stopAngle = canvas.TWO_PI - canvas.PI + 25 / 6;
-            }
-            canvas.arc(x, y, size, size, startAngle, stopAngle);
+
+        float startAngle = 0;
+        float stopAngle = PConstants.TWO_PI; // Default to closed mouth
+
+        // Adjust angles for the mouth based on the direction
+        float mouthAngle = PConstants.PI / 6; // Angle for the open mouth
+
+        if (direction == 0) { // Right
+            startAngle = mouthAngle;
+            stopAngle = PConstants.TWO_PI - mouthAngle;
+        } else if (direction == 1) { // Left
+            startAngle = PConstants.PI + mouthAngle;
+            stopAngle = PConstants.PI + PConstants.TWO_PI - mouthAngle;
+        } else if (direction == 2) { // Up
+            startAngle = 3 * PConstants.PI / 50 - 2 + mouthAngle;
+            stopAngle = 3 * PConstants.PI / 2 - mouthAngle;
+        } else if (direction == 3) { // Down
+            startAngle = PConstants.PI / 40 - 5  + mouthAngle;
+            stopAngle = PConstants.PI / 2 - mouthAngle;
+        }
+
+        // Draw Pacman with the arc
+        canvas.arc(x, y, size, size, startAngle, stopAngle, PConstants.PIE);
     }
 
     public float getX() {
